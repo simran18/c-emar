@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Metadata -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS -->
+    <style>
+
+        /* Basic Body */
+        html, body {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .slidecontainer {
+            width: 100%;
+        }
+
+        /* Header and Footer */
+		.header {
+            //position: fixed;
+            left: 0;
+            width: 100%;
+            background-color: #2d4d82;
+            color: white;
+            text-align: center;
+        }
+		
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #2d4d82;
+            color: white;
+            text-align: center;
+        }
+
+        /* Save Button */
+        .button {
+            background-color: #4092f7;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        /* The Sliders */
+        .slider {
+            -webkit-appearance: none;
+            /* Slider width is slightly above 50% for some nice line-up with the markers*/
+            width: 50.5%;
+            height: 25px;
+            background: #d3d3d3;
+            outline: none;
+
+            /*
+                Slider fades in and out a bit on hover, to add to UI responsive feel.
+                Roughly 0.25 seconds seems to be the Goldilocks zone.
+            */
+            opacity: 0.7;
+            -webkit-transition: .25s;
+            transition: opacity .25s;
+            border-radius: 10px;
+
+            /* Bottom Margin, originally 5% but modified to be much smaller*/
+            margin-bottom: 3%;
+        }
+
+            .slider:hover {
+                /* Convert to full opacity on hover */
+                opacity: 1;
+            }
+
+            .slider::-webkit-slider-thumb {
+                /* Slider config 1/2 */
+                -webkit-appearance: none;
+                appearance: none;
+                width: 10px;
+                height: 50px;
+                /* Color */
+                background: #4092f7;
+                cursor: pointer;
+                border-radius: 10%;
+            }
+
+            .slider::-moz-range-thumb {
+                /* Slider config 2/2 */
+                width: 25px;
+                height: 25px;
+                /* Color, again */
+                background: #4092f7;
+                cursor: pointer;
+                border-radius: 10%;
+            }
+    </style>
+</head>
+
+<!-- Body section, all implementation is here with no JavaScript -->
+<body>
+		<!-- Header Information -->
+		<div class="header" style="overflow: hidden; margin-bottom: 0.5%">
+			<h1>Stress and Mood Analysis Meter</h1>
+			<p><i>Results will save to a .txt file.</i></p>
+		</div>
+			
+		<!-- Everything from here on is bold -->
+		<b>
+	
+		<!-- Fields -->
+		<label style="margin-right: 1%; margin-top: 2%">
+			<span>Participant ID:</span>
+			<input type="text" id="parid"/>
+		</label>
+		
+		<label style="margin-right: 1%; margin-bottom: 2%">
+			<span>Researcher:</span>
+			<input type="text" id="researcher"/>
+		</label>
+		
+		<label style="margin-right: 1%; margin-bottom: 2%">
+			<span>Scenario:</span>
+			<select id="select">
+				<option value="selectone">- Select One -</option>
+				<option value="postsurvey">Post-Survey</option>
+				<option value="postvr">Post-VR</option>
+				<option value="postpc">Post-PC</option>
+				<option value="postv4">Post-V4</option>
+			</select>
+		</label>
+		
+		<!-- Buffer -->
+		<div style="width: 100%; overflow: hidden; margin-bottom: 1%">
+            <div style="color: white; width: 50%; float: left; margin-down: 1%;"> --------- </div>
+        </div>
+	
+        <!-- Title 1, copied from PDF -->
+        <h1>How <i>stressed</i> do you feel right now?</h1>
+
+        <!-- First slider markers/labels -->
+        <div style="width: 100%; overflow: hidden; margin-bottom: 0.5%">
+            <div style="width: 50%; float: left; margin-down: 50%;"> Very Low </div>
+            <div style="margin-left: 50%; margin-down: 50%;"> Very High </div>
+        </div>
+        <div style="width: 100%; overflow: hidden; margin-bottom: 2%">
+            <div style="width: 50%; float: left; margin-down: 50%;"> | </div>
+            <div style="margin-left: 50%; margin-down: 50%;"> | </div>
+        </div>
+
+        <!-- Stress slider -->
+        <div class="slidecontainer">
+            <input type="range" min="1" max="1000" value="0" class="slider" id="stressslider">
+        </div>
+
+        <!-- Title 2, also copied from PDF -->
+        <h1>What is your <i>mood</i> right now?</h1>
+
+        <!-- First slider markers/labels -->
+        <div style="width: 100%; overflow: hidden; margin-bottom: 0.5%">
+            <div style="width: 50%; float: left; margin-down: 50%;"> Very Low </div>
+            <div style="margin-left: 50%; margin-down: 50%;"> Very High </div>
+        </div>
+        <div style="width: 100%; overflow: hidden; margin-bottom: 2%">
+            <div style="width: 50%; float: left; margin-down: 50%;"> | </div>
+            <div style="margin-left: 50%; margin-down: 50%;"> | </div>
+        </div>
+
+        <!-- Mood Slider -->
+        <div class="slidecontainer">
+            <input type="range" min="1" max="1000" value="0" class="slider" id="moodslider">
+        </div>
+		
+        <!-- Save Button -->
+		<div>
+        <button class="button" onclick="recordData()"><b>Record Data</b></button>
+		</div>
+
+		<!-- Buffer -->
+		<div style="width: 100%; overflow: hidden; margin-bottom: 15%">
+            <div style="color: white; width: 50%; float: left; margin-down: 50%;"> --------- </div>
+        </div>
+		
+        <!-- Save Button Functionality Script -->
+        <script>
+			
+			// Quick access variables
+			var stressSlider = document.getElementById("stressslider");
+			var moodSlider = document.getElementById("moodslider");
+			var stress = "not changed";
+			var mood = "not changed";
+			
+			//Label variables
+			var researcherField = document.getElementById("researcher");
+			var parField = document.getElementById("parid");
+			var scenarioSelect = document.getElementById("select");
+			
+			// Slider input events
+			stressSlider.oninput = function() {
+				console.log("stress changed to " +  Math.floor(this.value/10));
+				stress = this.value;
+			}	
+			
+			moodSlider.oninput = function() {
+				console.log("mood changed to " +  Math.floor(this.value/10));
+				mood = this.value;
+			}
+			
+			// Save mood
+			function recordData() {
+			
+				if (parField.value === "") {
+					alert("Please fill out the Participant ID field.");
+					return;
+				}
+
+				if (researcherField.value === "") {
+					alert("Please fill out the Researcher field.");
+					return;
+				}
+
+				if (scenarioSelect.value == "selectone") {
+					alert("Please select a Scenario.");
+					return;
+				}
+				
+				if (parField.value.indexOf(':') > -1 || researcherField.value.indexOf(':') > -1 || parField.value.indexOf(',') > -1 || researcherField.value.indexOf(',') > -1) {
+					alert("You cannot use colons or commas in the Researcher or Participant ID fields.");
+					return;
+				}
+			
+				// Prevent un-changed values with an alert
+				if (mood === "not changed" || stress === "not changed") {
+					alert("Please move the slider to indicate your stress and mood levels.");
+					return;
+				}
+			
+				var text = ("stress: " + Math.floor(stress/10) + ", mood: " + Math.floor(mood/10) + ", participantid: "  + parField.value + ", researcher: " + researcherField.value + ", scenario: " + scenarioSelect.value);
+				download("meterv2-data-" + getRandomInt(10000) + ".txt", text);
+				
+				alert("Your data has been recorded will be saved to a TXT file.");
+				
+				location.reload();
+			}
+			
+			// Download a file
+			function download(filename, text) {
+			  var element = document.createElement('a');
+			  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+			  element.setAttribute('download', filename);
+
+			  element.style.display = 'none';
+			  document.body.appendChild(element);
+
+			  element.click();
+
+			  document.body.removeChild(element);
+			}
+			
+			// Random integer generation for file names
+			function getRandomInt(max) {
+				return Math.floor(Math.random() * Math.floor(max));
+			}
+        </script>
+
+		<!-- Footer Information -->
+        <div class="footer">
+            <p><i>Stress and Mood Analysis Meter v2.34, developed by Zealan Laferte.</i></p>
+        </div>
+
+</body>
+</html>
